@@ -204,7 +204,7 @@ fun <T> SearchableDropDown(
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
-                expanded = it
+                expanded = !expanded
             }
         ) {
             OutlinedTextField(
@@ -212,11 +212,12 @@ fun <T> SearchableDropDown(
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                     .fillMaxWidth()
                     .testTag(testTag),
-                value = searchQuery,
+                value = searchQuery.text,
                 onValueChange = {
-                    onSearchQueryChanged(it)
-                    expanded = true // Keep the dropdown open while searching
+                    // This is intentionally left blank.
+                    // The search query is updated from within the DropdownMenu.
                 },
+                readOnly = true,
                 label = { Text(label) },
                 trailingIcon = {
                     if (isSelected) {
@@ -226,7 +227,8 @@ fun <T> SearchableDropDown(
                         }) { Icon(Icons.Filled.Clear, contentDescription = "Clear selection") }
                     } else {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    }},
+                    }
+                },
                 singleLine = true
             )
             if (options.isNotEmpty()) {
@@ -234,6 +236,16 @@ fun <T> SearchableDropDown(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            onSearchQueryChanged(it)
+                        },
+                        label = { Text("Search") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
                     options.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(optionToString(option)) },
